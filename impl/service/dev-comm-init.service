@@ -1,0 +1,9 @@
+[Unit]
+Description=Device Communication Initializer
+
+[Service]
+ExecStart=/usr/bin/dev-comm-init-service
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
