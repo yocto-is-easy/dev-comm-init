@@ -12,14 +12,18 @@
 SerialFile::SerialFile() : fd_(-1) {
 }
 
-SerialFile::SerialFile(const std::string& path, uint32_t baudrate) {
-    open(path, baudrate);
+SerialFile::SerialFile(const std::string& path, uint32_t baudrate) 
+    : fd_(-1), path_(path), baudrate_(baudrate) {
 }
 
 SerialFile::~SerialFile() {
     if(isOpen()) {
         close();
     }
+}
+
+void SerialFile::open() {
+    open(path_, baudrate_);
 }
 
 void SerialFile::open(const std::string& path, uint32_t baudrate) {
@@ -74,6 +78,10 @@ void SerialFile::waitOpen(const std::string& path, uint32_t baudrate) {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
     }
+}
+
+void SerialFile::waitOpen() {
+    waitOpen(path_, baudrate_);
 }
 
 void SerialFile::close() {
@@ -137,6 +145,14 @@ std::string SerialFile::readLine() {
     return "";
 }
 
+std::string SerialFile::getPath() const {
+    return path_;
+}
+
+uint32_t SerialFile::getBaudrate() const {
+    return baudrate_;
+}
+
 SerialFileException::SerialFileException(const std::string& message) : message_(message) {
 }
 
@@ -145,24 +161,4 @@ SerialFileException::~SerialFileException() throw() {
 
 const char* SerialFileException::what() const throw() {
     return message_.c_str();
-}
-
-SerialFileBuilder::SerialFileBuilder() {
-}
-
-SerialFileBuilder::~SerialFileBuilder() {
-}
-
-SerialFileBuilder& SerialFileBuilder::path(const std::string& path) {
-    path_ = path;
-    return *this;
-}
-
-SerialFileBuilder& SerialFileBuilder::baudrate(uint32_t baudrate) {
-    baudrate_ = baudrate;
-    return *this;
-}
-
-SerialFile SerialFileBuilder::build() {
-    return SerialFile(path_, baudrate_);
 }

@@ -13,6 +13,7 @@ public:
 
     ~SerialFile();
 
+    void open();
     void open(const std::string& path, uint32_t baudrate);
     void close();
     bool isOpen() const;
@@ -21,6 +22,10 @@ public:
     std::string readLine();
 
     void waitOpen(const std::string& path, uint32_t baudrate);
+    void waitOpen();
+
+    std::string getPath() const;
+    uint32_t getBaudrate() const;
 
 private:
     int fd_;
@@ -38,18 +43,4 @@ public:
 
 private:
     std::string message_;
-};
-
-class SerialFileBuilder {
-public:
-    SerialFileBuilder();
-    ~SerialFileBuilder();
-
-    SerialFileBuilder& path(const std::string& path);
-    SerialFileBuilder& baudrate(uint32_t baudrate);
-    SerialFile build();
-
-private:
-    std::string path_;
-    uint32_t baudrate_;
 };

@@ -1,23 +1,17 @@
 #include <iostream>
 #include "SerialFile.hpp"
+#include "SerialDeviceMonitor.hpp"
+#include "SerialDeviceConfigurator.hpp"
+#include "WifiConfigSetuper.hpp"
 
 int main() {
-    std::string path = "/dev/ttyUSB0";
-    uint32_t baudrate = 115200;
+    SerialFile serialFile("/dev/ttyUSB0", B115200);
 
-    SerialFile serialFile;
-    serialFile.waitOpen(path, B115200);
+    SerialDeviceMonitor serialDeviceMonitor(serialFile);
+    SerialDeviceConfigurator serialDeviceConfigurator(serialDeviceMonitor);
+    serialDeviceConfigurator.addConfigSetuper(std::make_shared<WifiConfigSetuper>());
 
-    std::cout << "Serial file is open: " << path << std::endl;
-
-    try {
-        while(true) {
-            std::string line = serialFile.readLine();
-            std::cout << line << std::endl;
-        }
-    } catch(SerialFileException& e) {
-        std::cout << "Serial file exception: " << e.what() << std::endl;
-    }
+    serialDeviceMonitor.monitor();
 
     return 0;
 }

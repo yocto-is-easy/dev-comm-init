@@ -11,6 +11,10 @@ include_directories(
 add_executable(${SERVICE_NAME}
     impl/service/src/main.cpp
     impl/service/src/SerialFile.cpp
+    impl/service/src/SerialDeviceConfigurator.cpp
+    impl/service/src/SerialDeviceMonitor.cpp
+    impl/service/src/WifiConfigSetuper.cpp
+    impl/service/src/WifiData.cpp
 )
 
 find_package(Threads REQUIRED)
