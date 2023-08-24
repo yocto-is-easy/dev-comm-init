@@ -1,5 +1,7 @@
 #include "SerialDeviceConfigurator.hpp"
 
+#include <spdlog/spdlog.h>
+
 SerialDeviceConfigurator::SerialDeviceConfigurator(SerialDeviceMonitor& serialDeviceMonitor) {
     serialDeviceMonitor.setOnDeviceConnectedCallback([this](SerialFile& serialFile) {
         configure(serialFile);
@@ -7,7 +9,7 @@ SerialDeviceConfigurator::SerialDeviceConfigurator(SerialDeviceMonitor& serialDe
 }
 
 void SerialDeviceConfigurator::configure(SerialFile& serialFile) {
-    std::cout << "Configuring serial file: " << serialFile.getPath() << std::endl;
+    spdlog::info("Configuring serial file: {}", serialFile.getPath());
 
     for (auto configSetuper : configSetupers_) {
         configSetuper->setup(serialFile);

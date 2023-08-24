@@ -5,7 +5,7 @@
 
 class WifiData {
 public:
-    WifiData() = default;
+    WifiData();
 
     std::string ssid();
     std::string password();

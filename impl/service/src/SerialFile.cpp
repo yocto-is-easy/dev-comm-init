@@ -9,6 +9,8 @@
 #include <thread>
 #include <chrono>
 
+#include <spdlog/spdlog.h>
+
 SerialFile::SerialFile() : fd_(-1) {
 }
 
@@ -73,8 +75,6 @@ void SerialFile::waitOpen(const std::string& path, uint32_t baudrate) {
             open(path, baudrate);
             break;
         } catch(SerialFileException& e) {
-            std::cout << "No serial file detected(" << i << "): " << e.what() << std::endl;
-
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
     }

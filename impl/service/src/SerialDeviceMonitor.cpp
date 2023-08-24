@@ -3,6 +3,8 @@
 #include <thread>
 #include <chrono>
 
+#include <spdlog/spdlog.h>
+
 SerialDeviceMonitor::SerialDeviceMonitor(SerialFile& serialFile) 
     : serialFile_(serialFile) { }
 
@@ -24,11 +26,9 @@ void SerialDeviceMonitor::waitConnected() {
             serialFile_.close();
             break;
         } catch(SerialFileException& e) {
-            std::cout
-                << "No serial file detected("
-                << waitConnectedCounter << " - "
-                << waitConnectedTimeout_.count()
-                << "ms): " << e.what() << std::endl;
+            spdlog::debug("No serial file detected, wait({} - {}ms): {}",
+                waitConnectedCounter, waitConnectedTimeout_.count(), e.what());
+
             std::this_thread::sleep_for(waitConnectedTimeout_);
         }
     }
@@ -40,11 +40,8 @@ void SerialDeviceMonitor::waitDisconnected() {
         try {
             serialFile_.open();
             serialFile_.close();
-            std::cout 
-                << "Serial file still detected("
-                << waitDisconnectedCounter << " - "
-                << waitDisconnectedTimeout_.count()
-                << "ms): " << std::endl;
+            spdlog::debug("Serial file still detected, wait({} - {}ms)", 
+                waitDisconnectedCounter, waitDisconnectedTimeout_.count());
 
             std::this_thread::sleep_for(waitDisconnectedTimeout_);
         } catch(SerialFileException& e) {

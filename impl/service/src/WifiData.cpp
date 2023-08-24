@@ -1,11 +1,15 @@
 #include "WifiData.hpp"
 
-// TODO: Implement this stubs when Wifi service will be implemented
+#include "wifi-manager/i-wifi-manager.h"
+
+WifiData::WifiData() {
+    wifi_manager::wait_startup();
+}
 
 std::string WifiData::ssid() {
-    return "ssid";
+    return wifi_manager::get_wifi_ssid();
 }
 
 std::string WifiData::password() {
-    return "password";
+    return wifi_manager::get_wifi_password();
 }
