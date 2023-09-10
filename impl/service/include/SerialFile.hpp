@@ -17,9 +17,10 @@ public:
     void open(const std::string& path, uint32_t baudrate);
     void close();
     bool isOpen() const;
-    void write(std::string& data);
+    void write(const std::string& data);
     char read();
     std::string readLine();
+    void writeLine(const std::string& data);
 
     void waitOpen(const std::string& path, uint32_t baudrate);
     void waitOpen();

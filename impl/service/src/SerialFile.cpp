@@ -49,20 +49,22 @@ void SerialFile::open(const std::string& path, uint32_t baudrate) {
     cfsetospeed(&tty_, baudrate_);
     cfsetispeed(&tty_, baudrate_);
 
-    tty_.c_cflag &= ~PARENB;
-    tty_.c_cflag &= ~CSTOPB;
-    tty_.c_cflag &= ~CSIZE;
-    tty_.c_cflag |= CS8;
-    tty_.c_cflag &= ~CRTSCTS;
-    tty_.c_cflag |= CREAD | CLOCAL;
+    tty_.c_cflag = (tty_.c_cflag & ~CSIZE) | CS8;
+    tty_.c_iflag &= ~IGNBRK;
+    tty_.c_lflag = 0;
+
+    tty_.c_oflag = 0;
+    tty_.c_cc[VMIN]  = 0;
+    tty_.c_cc[VTIME] = 5;
 
     tty_.c_iflag &= ~(IXON | IXOFF | IXANY);
-    tty_.c_iflag &= ~(ICANON | ECHO | ECHOE | ISIG);
 
-    tty_.c_oflag &= ~OPOST;
+    tty_.c_cflag |= (CLOCAL | CREAD);
 
-    tty_.c_cc[VMIN] = 0;
-    tty_.c_cc[VTIME] = 0;
+    tty_.c_cflag &= ~(PARENB | PARODD);
+    tty_.c_cflag |= 0;
+    tty_.c_cflag &= ~CSTOPB;
+    tty_.c_cflag &= ~CRTSCTS;
 
     if(tcsetattr(fd_, TCSANOW, &tty_) != 0) {
         throw SerialFileException("Failed to set serial file attributes: " + path_ + " (" + strerror(errno) + ")");
@@ -100,7 +102,13 @@ bool SerialFile::isOpen() const {
     return fd_ >= 0;
 }
 
-void SerialFile::write(std::string& data) {
+void SerialFile::write(const std::string& data) {
+    if(!isOpen()) {
+        throw SerialFileException("Serial file is not open: " + path_);
+    }
+
+    spdlog::info("SerialFile::write - data: {}", data);
+
     if(::write(fd_, data.c_str(), data.size()) < 0) {
         throw SerialFileException("Failed to write to serial file: " + path_ + " (" + strerror(errno) + ")");
     }
@@ -143,6 +151,15 @@ std::string SerialFile::readLine() {
     }
 
     return "";
+}
+
+void SerialFile::writeLine(const std::string& data) {
+    if(!isOpen()) {
+        throw SerialFileException("Serial file is not open: " + path_);
+    }
+
+    const std::string line = data + "\n";
+    write(line);
 }
 
 std::string SerialFile::getPath() const {
